@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3-Tier Docker App</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; }
+        button { font-size: 1.1em; padding: 10px; margin: 10px 0; }
+        #status { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the 3-Tier Docker Application!</h1>
+    
+    <button onclick="checkBackend()">Test Backend Connection</button>
+    <button onclick="checkDatabase()">Test Database Connection</button>
+
+    <div id="status"></div>
+
+    <script>
+        // This function calls our backend's '/' route
+        async function checkBackend() {
+            const statusDiv = document.getElementById('status');
+            try {
+                // The '/api/' path is a proxy defined in nginx.conf
+                const response = await fetch('/api/');
+                const data = await response.text();
+                statusDiv.innerText = `Backend says: "${data}"`;
+                statusDiv.style.color = 'green';
+            } catch (error) {
+                statusDiv.innerText = 'Error connecting to backend: ' + error;
+                statusDiv.style.color = 'red';
+            }
+        }
+
+        // This function calls our backend's '/db_status' route
+        async function checkDatabase() {
+            const statusDiv = document.getElementById('status');
+            try {
+                // The '/api/' path is a proxy defined in nginx.conf
+                const response = await fetch('/api/db_status');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.innerText = `DB Status: ${data.message}`;
+                    statusDiv.style.color = 'green';
+                } else {
+                    statusDiv.innerText = `DB Status: ${data.message}`;
+                    statusDiv.style.color = 'red';
+                }
+            } catch (error) {
+                statusDiv.innerText = 'Error connecting to database via backend: ' + error;
+                statusDiv.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>
